@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recipe Comments</title>
+    <link rel="stylesheet" href="../style.css" />
+    <style>
+      :root {
+        --brand: #7a1ebd;
+        --ink: #111827;
+        --sub: #6b7280;
+        --surface: #ffffff;
+        --card: #ffffff;
+        --line: #e5e7eb;
+        --shadow: 0 6px 24px rgba(0,0,0,.08);
+        --radius: 18px;
+      }
+      
+      body { 
+        background: #f7f7fb; 
+        color: var(--ink); 
+        font-family: system-ui, sans-serif; 
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+      }
+
+      .container {
+        max-width: 480px;
+        width: 100%;
+        background: white;
+        min-height: 100vh;
+        position: relative;
+      }
+
+      /* Back button */
+      .back-btn {
+        position: absolute;
+        top: 18px;
+        left: 18px;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: rgba(200,200,200,0.5);
+        border: 1px solid rgba(255,255,255,0.08);
+        backdrop-filter: blur(6px);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+        cursor: pointer;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+      }
+      .back-btn:hover { 
+        background: rgba(200,200,200,0.6);
+        box-shadow: 0 5px 14px rgba(0, 0, 0, 0.22);
+        transform: scale(1.05);
+      }
+      .back-btn:active {
+        background: rgba(180,180,180,0.5);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        transform: scale(0.98);
+      }
+      .comment-back-icon {
+        width: 20px;
+        height: 20px;
+        stroke: #ffffff;
+      }
+
+      .page-title {
+        text-align: center;
+        margin-top: 50px; 
+        font-size: 22px;
+        font-weight: bold;
+      }
+
+      .producer {
+        text-align: center;
+        color: #555;
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+
+      /* Rating section adjustments */
+      .rating-section {
+        text-align: center;
+        margin-top: 0;
+        padding: 0 20px;
+      }
+
+      .rating-header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        font-size: 18px;
+      }
+
+      .stars {
+        font-size: 24px;
+        color: gold;
+        margin: 0;
+      }
+
+      .rating-value {
+        font-weight: bold;
+      }
+
+      .favourite-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        display: inline-flex;
+      }
+
+      .heart-icon {
+        width: 24px;
+        height: 24px;
+      }
+
+      .heart-icon path {
+        stroke: #e74c3c;
+        stroke-width: 2;
+        fill: none;
+      }
+
+      .favourite-btn.active .heart-icon path {
+        fill: #e74c3c;
+        stroke: #e74c3c;
+      }
+
+      .ratings-count {
+        font-size: 14px;
+        color: #666;
+        margin-top: 4px;
+      }
+
+      .rating-bars {
+        margin: 15px 20px;
+        font-size: 14px;
+      }
+
+      .rating-bars div {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 6px 0;
+      }
+
+      .bar {
+        background: #ddd;
+        flex: 1;
+        height: 8px;
+        border-radius: 5px;
+        overflow: hidden;
+      }
+
+      .fill {
+        background: #ffc107;
+        height: 100%;
+      }
+
+      .tags-wrap {
+        margin: 0 20px 20px;
+      }
+
+      .tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+      }
+
+      .tag {
+        padding: 4px 12px;
+        border: 1px solid #007aff;
+        border-radius: 20px;
+        background: #e6f2ff;
+        color: #007aff;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .comment-box {
+        border: 1px solid #ccc;
+        border-radius: 12px;
+        padding: 12px;
+        margin: 0 20px 20px;
+        background: white;
+      }
+
+      .comment-toolbar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+
+      .format-btn {
+        background: none;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        color: #666;
+      }
+
+      .comment-input {
+        width: 100%;
+        border: none;
+        outline: none;
+        resize: none;
+        font-size: 14px;
+        min-height: 40px;
+        margin-bottom: 8px;
+      }
+
+      .comment-stars {
+        text-align: center;
+        color: #ccc;
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      .star {
+        display: inline-block;
+        transition: color 0.2s;
+      }
+
+      .star.selected {
+        color: gold;
+      }
+
+      .comment {
+        padding: 12px 20px;
+        border-top: 1px solid #eee;
+      }
+
+      .comment-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        margin-bottom: 4px;
+      }
+
+      .comment-user {
+        font-weight: bold;
+      }
+
+      .comment-rating {
+        color: gold;
+      }
+
+      .comment-text {
+        margin-bottom: 8px;
+        font-size: 15px;
+      }
+
+      .comment-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+        color: #007aff;
+      }
+
+      .reply-btn, .like-btn, .dislike-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .media-preview {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .media-item {
+        background: #f0f0f0;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        color: #666;
+      }
+
+      /* Bottom nav */
+      .bottom-nav {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-around;
+        padding: 8px 0;
+        height: 60px;
+      }
+
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: #666;
+        font-size: 12px;
+        transition: color 0.2s;
+      }
+
+      .nav-item.active {
+        color: #007AFF;
+      }
+
+      .nav-icon {
+        font-size: 20px;
+        margin-bottom: 4px;
+      }
+
+      .nav-text {
+        font-weight: 500;
+      }
+
+      @media (min-width: 481px) {
+        .container {
+          border-left: 1px solid #e0e0e0;
+          border-right: 1px solid #e0e0e0;
+          box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <button class="back-btn" onclick="goBack()" aria-label="Back">
+        <svg class="comment-back-icon" viewBox="0 0 24 24">
+          <path d="M14 6 L8 12 L14 18"
+                fill="none"
+                stroke="#ffffff"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round" />
+        </svg>
+      </button>
+
+      <h1 class="page-title">Tomato Pork Spaghetti</h1>
+      <p class="producer">By Producer</p>
+
+      <div class="rating-section">
+        <div class="rating-header">
+          <span class="rating-value">Rating: 3.4</span>
+          <span class="stars">★★★☆☆</span>
+          <button class="favourite-btn" id="favouriteBtn" onclick="toggleFavourite()">
+            <svg class="heart-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.09C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5C22 12.28 18.6 15.36 13.45 20.03L12 21.35Z"/>
+            </svg>
+          </button>
+        </div>
+        <div class="ratings-count">1,234 ratings</div>
+      </div>
+
+      <div class="rating-bars">
+        <div>5 star <div class="bar"><div class="fill" style="width: 90%;"></div></div></div>
+        <div>4 star <div class="bar"><div class="fill" style="width: 60%;"></div></div></div>
+        <div>3 star <div class="bar"><div class="fill" style="width: 40%;"></div></div></div>
+        <div>2 star <div class="bar"><div class="fill" style="width: 20%;"></div></div></div>
+        <div>1 star <div class="bar"><div class="fill" style="width: 10%;"></div></div></div>
+      </div>
+
+      <div class="tags-wrap">
+        <div class="tags-container">
+          <span class="tag">Pasta</span>
+          <span class="tag">Tomato</span>
+          <span class="tag">Main Dish</span>
+        </div>
+      </div>
+
+      <div class="comment-box">
+        <div class="comment-toolbar">
+          <button class="format-btn"><b>B</b></button>
+          <button class="format-btn"><i>I</i></button>
+          <button class="format-btn"><u>U</u></button>
+          <button class="format-btn">🖼️</button>
+        </div>
+        <textarea id="commentInput" class="comment-input" placeholder="Your comment..."></textarea>
+        <div class="comment-stars">
+          <span class="star" data-value="1">☆</span>
+          <span class="star" data-value="2">☆</span>
+          <span class="star" data-value="3">☆</span>
+          <span class="star" data-value="4">☆</span>
+          <span class="star" data-value="5">☆</span>
+        </div>
+      </div>
+
+      <div id="commentsSection">
+        <div class="comment" data-comment-id="static1">
+          <div class="comment-header">
+            <span class="comment-user">User_name_1</span> • Jan 12, 2025
+            <span class="comment-rating">★★★★★</span>
+          </div>
+          <p class="comment-text">This recipe was amazing! I'll definitely make it again.</p>
+          <div class="comment-actions">
+            <button class="reply-btn">Reply ↓</button>
+            <button class="like-btn">👍 <span class="like-count">10</span></button>
+            <button class="dislike-btn">👎 <span class="dislike-count">1</span></button>
+          </div>
+        </div>
+
+        <div class="comment" data-comment-id="static2">
+          <div class="comment-header">
+            <span class="comment-user">User_name_2</span> • Jan 10, 2025
+            <span class="comment-rating">★★★☆☆</span>
+          </div>
+          <p class="comment-text">Good recipe but could use more seasoning.</p>
+          <div class="comment-actions">
+            <button class="reply-btn">Reply ↓</button>
+            <button class="like-btn">👍 <span class="like-count">2</span></button>
+            <button class="dislike-btn">👎 <span class="dislike-count">0</span></button>
+          </div>
+          <div class="media-preview">
+            <div class="media-item">▶️ Video</div>
+            <div class="media-item">Picture</div>
+            <div class="media-item">Picture</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <a href="index.html" class="nav-item active">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-text">Home</span>
+        </a>
+        <a href="search.html" class="nav-item">
+          <span class="nav-icon">🔍</span>
+          <span class="nav-text">Search</span>
+        </a>
+        <a href="upload.html" class="nav-item">
+          <span class="nav-icon">➕</span>
+          <span class="nav-text">Upload</span>
+        </a>
+        <a href="favourites.html" class="nav-item">
+          <span class="nav-icon">🩷</span>
+          <span class="nav-text">Favourites</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+          <span class="nav-icon">👤</span>
+          <span class="nav-text">Profile</span>
+        </a>
+      </div>
+    </div>
+
+    <script>
+      function goBack() {
+        window.history.back();
+      }
+
+      function toggleFavourite() {
+        const favouriteBtn = document.getElementById('favouriteBtn');
+        favouriteBtn.classList.toggle('active');
+      }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const recipeKey = urlParams.get('recipe') || 'pasta';  
+
+      // Load recipe data 
+      window.addEventListener('load', async () => {
+        await loadRecipeData();
+      });
+
+      async function loadRecipeData() {
+        try {
+          const response = await fetch(`../recipes/${recipeKey}.json`);
+          const data = await response.json();
+          document.querySelector('.page-title').textContent = data.title;
+          const ratingParts = data.rating.split(' ');
+          const stars = ratingParts[0];
+          const num = ratingParts[1];
+          document.querySelector('.stars').textContent = stars + (stars.length < 5 ? '☆'.repeat(5 - stars.length) : '');
+          document.querySelector('.rating-value').textContent = `Rating: ${num}`;
+          // Tags
+          const tagsContainer = document.querySelector('.tags-container');
+          tagsContainer.innerHTML = '';
+          data.tags.forEach(tag => {
+            const span = document.createElement('span');
+            span.className = 'tag';
+            span.textContent = tag;
+            tagsContainer.appendChild(span);
+          });
+        } catch (error) {
+          console.error('Failed to load recipe data:', error);
+        }
+      }
+
+    </script>
+  </body>
+</html>
